@@ -284,7 +284,6 @@ def main() -> None:
     composefs_dump = ["/ 4096 40755 1 0 0 0 0.0 - - -"]  # Root directory
     for key in sorted(paths):
         composefs_path = paths[key]
-        eprint(composefs_path.path)
         composefs_dump.append(composefs_path.write_line())
 
     print("\n".join(composefs_dump))
