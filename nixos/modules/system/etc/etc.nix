@@ -333,7 +333,9 @@ in
                   ${
                     if config.system.etc.overlay.mutable then
                       ''
-                        if [[ -f "$mountPoint" ]]; then
+                        # Touching an existing lower-layer placeholder copies it
+                        # up with an origin handle into the old metadata image.
+                        if [[ -f "$mountPoint" && ! -e "$tmpMountPoint" ]]; then
                           touch "$tmpMountPoint"
                         elif [[ -d "$mountPoint" ]]; then
                           mkdir -p "$tmpMountPoint"
