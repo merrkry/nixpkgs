@@ -23,16 +23,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "mise";
-  version = "2026.10.3";
+  version = "2026.10.14";
 
   src = fetchFromGitHub {
     owner = "jdx";
     repo = "mise";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-w9d/S1+4JBBWmZoLpVU1I4OiRJNGXSIoRHvtAkoR5Y0=";
+    hash = "sha256-u3fJYskOFehBntjfTy/tWP7OjAa84GlB0mFjWMjib+Y=";
   };
 
-  cargoHash = "sha256-gkCta9qiXKUmUnp6FfLStE5IM6ax/nmjMzQ+SDNg77U=";
+  cargoHash = "sha256-4bwGtiNNYPs4PtvFcjumlOK2PpasCkMYnj1yoDX0dP0=";
 
   nativeBuildInputs = [
     installShellFiles
@@ -50,6 +50,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
     substituteInPlace ./src/testing.rs \
       --replace-fail '/usr/bin/env bash' '${lib.getExe bash}'
+
+    substituteInPlace ./src/toolset/running.rs \
+      --replace-fail '/usr/bin/sleep' '${lib.getExe' coreutils "sleep"}'
+
+    substituteInPlace ./crates/mise-util/src/file/tests/links.rs \
+      --replace-fail '#!/bin/bash' '#!${lib.getExe bash}'
 
     substituteInPlace ./crates/mise-util/src/git.rs \
       --replace-fail '"git"' '"${lib.getExe git}"'
@@ -132,11 +138,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "cmd::tests::test_macos_sandbox_preserves_piped_stdin"
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
-    # un_dmg shells out to hdiutil
-    "--skip"
-    "file::tests::links::un_dmg_accepts_license_and_extracts_app"
-    "--skip"
-    "file::tests::links::un_dmg_extracts_app_without_license"
     # the copy probe symlinks /bin/cp, which the sandbox does not provide
     "--skip"
     "backend::spm::tests::test_inline_install_command_uses_install_environment"
